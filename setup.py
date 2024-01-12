@@ -5,16 +5,25 @@ with open("README.md", "r") as f:
 
 setup(
     name='alegant',
-    version='1.0.1',
-    packages=find_packages(where="alegant",exclude=["dist.*", "dist", "*tests*", "*script*", "*cache*"]),
-    url='https://github.com/Hugo-Zhu',
+    version='1.0.4',
+    packages=find_packages(exclude=["dist.*", "dist", "*tests*", "*script*", "*cache*"]),
+    url='https://github.com/Hugo-Zhu/alegant',
     license='MIT',
     author='Haohao Zhu',
     author_email='zhuhh17@qq.com',
     description='Alegant: a elegant training framework',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    install_requires=['torch', 'numpy', 'loguru'],
+    install_requires=[
+                    'attrdict',
+                    'loguru',
+                    'numpy', 
+                    'pyyaml',
+                    'six',     # required by tensorboard
+                    'tensorboard',
+                    'torch',
+                    'tqdm',
+                    ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

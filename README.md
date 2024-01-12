@@ -2,6 +2,20 @@
 
 Alegant is an elegant training framework for PyTorch models.
 
+## Install Alegant
+
+Before installing Alegant, please make sure you have the following requirements:
+- Python >= 3.7
+- torch >= 1.9
+
+Simple installation from PyPI
+```bash
+pip install alegant
+```
+To install fairseq and develop locally:
+```bash
+python setup.py develop
+```
 ## Usage
 To use alegant, follow the steps below:
 
@@ -38,6 +52,7 @@ alegant
 │   └── utils.py
 ├── config.yaml
 ├── run.py
+└── setup.py
 ```
 
 ## Contact
