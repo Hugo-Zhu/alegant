@@ -1,5 +1,5 @@
 # Global parameters
-do_test: True         # whether to perform testing or training
+do_test: False         # whether to perform testing or training
 random_seed: 1
 dataset: kaggle       # dataset name
 log_file: train.log   # path to save the log file

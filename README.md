@@ -16,18 +16,26 @@ To install fairseq and develop locally:
 ```bash
 python setup.py develop
 ```
+
+## Example
+
+For examples on how to use Elegant, please refer to the examples directory in this repository. It contains sample configuration files and code snippets to help you get started.
+
 ## Usage
+
 To use alegant, follow the steps below:
 
 1. Define your Model.
 2. Define your DataModule.
 3. Define your Trainer.
-4. Run the training script using the following command:
+4. Set your configuration.
+5. Run the training script using the following command:
 
-```python
-python --config_file run.py
+```bash
+cd alegant/example
+python example_main.py  # for simply use the DataModule and Trainer
+python example_runner.py # for using the runner from Alegant
 ```
-Make sure to replace config_file with the path to your configuration file.
 
 ## Configuration
 To customize the training process, you need to provide a configuration file. This file specifies various parameters such as dataset paths, model architecture, hyperparameters, etc. Make sure to create a valid configuration file before running the framework.
@@ -36,22 +44,28 @@ To customize the training process, you need to provide a configuration file. Thi
 
 ```plaintext
 alegant
-├── tensorboard
-├── data
 ├── alegant
+│   ├── __init__.py
+│   ├── runner.py
+│   ├── trainer.py
 │   ├── data_module.py
-│   ├── trainer.py
-│   └── utils.py
-├── src
-│   ├── dataset.py
-│   ├── loss.py
-│   ├── model
-│   │   ├── modeling.py
-│   │   ├── poolers.py
-│   ├── trainer.py
-│   └── utils.py
-├── config.yaml
-├── run.py
+│   └── utils.py
+│   └── example
+│       ├── data
+│       ├── config.yaml
+│       ├── example_main.py
+│       ├── example_runner.py
+│       ├── logs
+│       ├── README.md
+│       ├── src
+│       │   ├── dataset.py
+│       │   ├── loss.py
+│       │   ├── model
+│       │   │   ├── modeling.py
+│       │   │   ├── poolers.py
+│       │   ├── trainer.py
+│       │   └── utils.py
+│       └── tensorboard
 └── setup.py
 ```
 
