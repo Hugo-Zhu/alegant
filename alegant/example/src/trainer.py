@@ -56,7 +56,7 @@ class BertTrainer(Trainer):
 
         self.logger.add_scalar("avg_f1", avg_f1, self.num_eval)
         
-        # update best metrix
+        # Update best metrix
         if avg_f1 > self.best_f1:
             self.best_f1 = avg_f1
             if self.args.do_save:
@@ -87,7 +87,7 @@ class BertTrainer(Trainer):
     def configure_optimizers(self, num_training_steps):
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
         
-        # param 分组: 1. parms of PLM, 2.params of other components
+        # Parameter groups: 1. parms of PLM, 2.params of other components
         params_plm = []
         no_decay_params_plm = []
         params = []
@@ -108,7 +108,7 @@ class BertTrainer(Trainer):
                 else:
                     params.append(param)
 
-        # grouped parameters
+        # Grouped parameters
         optimizer_grouped_parameters = [
             {
                 "params": params_plm,
@@ -132,7 +132,7 @@ class BertTrainer(Trainer):
             }
         ]
 
-        # define the optimizer
+        # Define the optimizer
         optimizer = Adam(optimizer_grouped_parameters)
         scheduler = None
 

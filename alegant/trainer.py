@@ -219,14 +219,14 @@ class Trainer(ABC):
         Returns:
             dict: Dictionary containing the training step outputs.
         """
-        # 获取数据并移动到设备
+        # load data & to device
         input_ids = batch['input_ids'].to(self.args.device)
         label = batch['label'].to(self.args.device)
         
         with autocast(enabled=self.args.amp):
-            # 前向传播
+            # forward
             logits = self.model(input_ids)
-            # 计算损失
+            # calculate loss
             loss = self.criterion(logits, label)
         
         return {"loss": loss}
@@ -249,7 +249,7 @@ class Trainer(ABC):
         Returns:
             dict: Dictionary containing the validation step outputs.
         """
-        # 获取数据并移动到设备 -> 前向传播 -> 计算损失 -> 记录评价指标
+        # load data & to device -> forward -> calculate loss -> log metrics
         input_ids = batch['input_ids'].to(self.args.device)
         label = batch['label'].to(self.args.device)
         with autocast(enabled=self.args.amp):

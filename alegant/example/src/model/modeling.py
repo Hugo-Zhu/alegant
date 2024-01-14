@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.init as init
 from transformers import BertModel
 from dataclasses import dataclass, field
-from .poolers import AveragePooler
+from .pooling import AveragePooler
 
 
 @dataclass

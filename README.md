@@ -49,7 +49,7 @@ alegant
 │   ├── runner.py
 │   ├── trainer.py
 │   ├── data_module.py
-│   └── utils.py
+│   ├── utils.py
 │   └── example
 │       ├── data
 │       ├── config.yaml
