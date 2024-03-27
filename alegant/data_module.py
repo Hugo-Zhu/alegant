@@ -24,9 +24,9 @@ class DataModuleConfig:
         test_batch_size (Optional[int]): Batch size for test data. Defaults to 32.
         test_limit_batches (Optional[float]): Batch limit ratio for test data. Defaults to 1.0.
     """
-    train_data_path: str
-    val_data_path: str
-    test_data_path: str
+    train_data_path: str = field(default=None, metadata={"description": "File path to the training data"})
+    val_data_path: str = field(default=None, metadata={"description": "File path to the validation data"})
+    test_data_path: str = field(default=None, metadata={"description": "File path to the test data"})
     do_setup: bool = field(default=True, metadata={"description": "Whether prepare datasets from data_paths"})
     cache_dir: str = field(default=None, metadata={"description": "Path to cache the datasets"})
     

@@ -12,18 +12,18 @@ Simple installation from PyPI
 ```bash
 pip install alegant
 ```
-To install fairseq and develop locally:
+To install Alegant and develop locally:
 ```bash
 python setup.py develop
 ```
 
 ## Example
 
-For examples on how to use Elegant, please refer to the examples directory in this repository. It contains sample configuration files and code snippets to help you get started.
+For examples on how to use elegant, please refer to the examples directory in this repository. It contains sample configuration files and code snippets to help you get started.
 
 ## Usage
 
-To use alegant, follow the steps below:
+To use Alegant, follow the steps below:
 
 1. Define your Model.
 2. Define your DataModule.
