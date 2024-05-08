@@ -24,6 +24,16 @@ class Runner(ABC):
         runner = MyRunner()
         runner.run()
     """
+    def __init__(self) -> None:
+        super().__init__()
+        self.args = parse_args()
+        logger.add(f"logs/{datetime.datetime.now().date()}/{self.args.log_file}", format="<green>{time:YYYY/MM/DD HH:mm}</green> |<level>{level}</level>| <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>") # Set path for logs
+        logger.add(f"logs/{datetime.datetime.now().date()}/summary_{self.args.log_file}", format="<green>{time:YYYY/MM/DD HH:mm}</green> |<level>{level}</level>| <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>", level="SUCCESS")
+        # logger.info("Configuration:" + json.dumps(self.args, indent=4))
+        logger.success(f"CONFIG:{self.args.config_file}")
+        # logger.info(f"python {os.path.basename(__file__)}!!!")
+        seed_everything(self.args.random_seed)
+
     @abstractmethod
     def setup(self):
         """Initialize the model & data_module & trainer_class
@@ -47,11 +57,6 @@ class Runner(ABC):
         and starts the training or testing based on the command line arguments.
 
         """
-        self.args = parse_args()
-        logger.add(f"logs/{datetime.datetime.now().date()}/{self.args.log_file}") # Set path for logs
-        logger.info("Configuration:" + json.dumps(self.args, indent=4))
-        logger.warning(f"python {os.path.basename(__file__)}!!!")
-        seed_everything(self.args.random_seed)
         start_time = datetime.datetime.now()
         
         # Initialize model & data_module
@@ -72,5 +77,5 @@ class Runner(ABC):
         end_time = datetime.datetime.now()
         training_duration = end_time - start_time
         training_minutes = training_duration.total_seconds() / 60
-        logger.success(f"Time Consuming: {training_minutes} minutes \n\n")
+        logger.info(f"RUN TIME: {training_minutes} minutes. \n\n")
 

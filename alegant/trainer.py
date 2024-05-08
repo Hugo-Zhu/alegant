@@ -113,7 +113,7 @@ class Trainer(ABC):
         # Start train loop
         for self.epoch in range(self.start_epoch, self.args.epochs):
             self.model.train()
-            for batch_idx, batch in tqdm(enumerate(train_dataloader), f"Epoch: {self.epoch}", total=len(train_dataloader), miniters=len(train_dataloader)*0.1, maxinterval=float("inf")):
+            for batch_idx, batch in tqdm(enumerate(train_dataloader), f"EPOCH: {self.epoch}", total=len(train_dataloader), miniters=len(train_dataloader)*0.1, maxinterval=float("inf")):
                 outputs = self.training_step(batch, batch_idx)
                 loss = outputs.get("loss")/self.args.accumulation_steps     # 除不除accumulation_steps对结果有影响
                 # loss.backward()
@@ -147,6 +147,7 @@ class Trainer(ABC):
                     self.validation(eval_dataloader)
             
             self.training_epoch_end()
+        logger.success(f"best_f1: {self.best_f1:.5f}")
         self.logger.close()
     
 
@@ -162,7 +163,7 @@ class Trainer(ABC):
         eval_outputs = []
         
         self.num_eval += 1
-        for batch_idx_eval, batch_eval in tqdm(enumerate(eval_dataloader), "evalation", total=len(eval_dataloader), miniters=len(eval_dataloader)*0.1, maxinterval=float("inf")):
+        for batch_idx_eval, batch_eval in tqdm(enumerate(eval_dataloader), "EVALUATING", total=len(eval_dataloader), miniters=len(eval_dataloader)*0.1, maxinterval=float("inf")):
             outputs = self.validation_step(batch_eval, batch_idx_eval)
             loss = outputs.get("loss")
             eval_outputs.append(outputs)
@@ -185,7 +186,8 @@ class Trainer(ABC):
         self.model.to(self.args.device)
         # Load the checkpoint
         if checkpoint is None:
-            logger.warning("Checkpoint is None during TESTING !!!")
+            logger.error("Checkpoint is None during TESTING !!!")
+            raise Exception
         else:
             logger.info(f"Loading checkpoint from {checkpoint} ...")
             checkpoint = torch.load(checkpoint, map_location=self.args.device)
@@ -196,7 +198,7 @@ class Trainer(ABC):
         self.model.eval()
         test_outputs = []
         num_test_step = 0
-        for batch_idx_test, batch_test in tqdm(enumerate(dataloader), "test", total=len(dataloader)):
+        for batch_idx_test, batch_test in tqdm(enumerate(dataloader), "TESTING", total=len(dataloader)):
             outputs = self.test_step(batch_test, batch_idx_test)
             loss = outputs.get("loss")
             test_outputs.append(outputs)
@@ -284,7 +286,7 @@ class Trainer(ABC):
             self.best_acc = accuracy
             if self.args.do_save:
                 self.save_checkpoint()
-        logger.success(f"acc: {accuracy}, best_acc: {self.best_acc}")
+        logger.info(f"acc: {accuracy}; best_acc: {self.best_acc}")
 
 
     def test_step(self, batch, batch_idx):
@@ -310,7 +312,7 @@ class Trainer(ABC):
 
         metrics = self.compute_metrics(preds_list, label_list)
         accuracy = metrics.get("accuracy")
-        logger.info(f"acc: {accuracy}")
+        logger.info(f"Acc: {accuracy}")
 
     @abstractmethod
     def configure_optimizers(self, num_training_steps):
