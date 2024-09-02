@@ -91,7 +91,7 @@ class Trainer(ABC):
         
         # Initialize optimizer
         num_training_steps = len(train_dataloader) * self.args.epochs
-        self.optimizer, self.scheduler = self.configure_optimizers(num_training_steps)
+        self.optimizers, self.schedulers = self.configure_optimizers(num_training_steps)
         
         # Load checkpoint or initialize training variables
         if checkpoint is not None:
@@ -113,41 +113,48 @@ class Trainer(ABC):
         # Start train loop
         for self.epoch in range(self.start_epoch, self.args.epochs):
             self.model.train()
+            train_outputs = []
             for batch_idx, batch in tqdm(enumerate(train_dataloader), f"EPOCH: {self.epoch}", total=len(train_dataloader), miniters=len(train_dataloader)*0.1, maxinterval=float("inf")):
                 outputs = self.training_step(batch, batch_idx)
+                train_outputs.append(outputs)
                 loss = outputs.get("loss")/self.args.accumulation_steps     # 除不除accumulation_steps对结果有影响
                 # loss.backward()
                 scaler.scale(loss).backward()
                 
                 # Clip gradients for each parameter group in the optimizer
-                if self.args.max_norm is not None:
-                    for param_group in self.optimizer.param_groups:
-                        torch.nn.utils.clip_grad_norm_(param_group['params'], self.args.max_norm)
+                for optimizer in self.optimizers:
+                    if self.args.max_norm is not None:
+                        for param_group in optimizer.param_groups:
+                            torch.nn.utils.clip_grad_norm_(param_group['params'], self.args.max_norm)
                 
                 self.num_train_step += 1
                 self.logger.add_scalar(f"train_loss", loss.item(), self.num_train_step)
                 
                 # Update the learning rate each batch
-                if self.scheduler is not None:
-                    self.scheduler.step()
+                if len(self.schedulers) > 0:
+                    for scheduler in self.schedulers:
+                        scheduler.step()
 
-                    current_learning_rate = self.optimizer.param_groups[0]['lr']  # 这里只记录第一个参数组中的学习率
+                    current_learning_rate = self.optimizers[0].param_groups[0]['lr']  # 这里只记录第一个参数组中的学习率
                     self.logger.add_scalar("learning_rate", current_learning_rate, self.num_train_step)
 
                 # Gradient accumulation
                 if (batch_idx+1) % self.args.accumulation_steps == 0 or (batch_idx+1)==len(train_dataloader):
-                    # self.optimizer.step()
-                    scaler.step(self.optimizer)
+                    for optimizer in self.optimizers:
+                        # optimizer.step()
+                        scaler.step(optimizer)
                     scaler.update()
                     
-                    self.optimizer.zero_grad()
+                    for optimizer in self.optimizers:
+                        optimizer.zero_grad()
                 
                 # Evaluation loop
                 if (batch_idx+1) % self.args.eval_steps == 0 or (batch_idx+1)==len(train_dataloader):
                     self.validation(eval_dataloader)
             
-            self.training_epoch_end()
+            self.training_epoch_end(train_outputs)
         logger.success(f"best_f1: {self.best_f1:.5f}")
+        # logger.success(f"best: {self.best}")
         self.logger.close()
     
 
@@ -233,7 +240,7 @@ class Trainer(ABC):
         
         return {"loss": loss}
 
-    def training_epoch_end(self):
+    def training_epoch_end(self, outputs):
         """
         Perform operations at the end of each training epoch.
         """
@@ -323,7 +330,7 @@ class Trainer(ABC):
             num_training_steps (int): Total number of training steps.
 
         Returns:
-            tuple: Tuple containing the optimizer and learning rate scheduler.
+            tuple: Tuple containing the list of optimizers and learning rate schedulers.
         """
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
         
@@ -378,7 +385,7 @@ class Trainer(ABC):
         # scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_warmup_steps, num_training_steps=num_training_steps)
         scheduler = None
 
-        return optimizer, scheduler
+        return [optimizer], []
     
     def save_checkpoint(self):
         """
@@ -393,7 +400,7 @@ class Trainer(ABC):
         torch.save({
             'epoch': self.epoch,
             'model_state_dict': model_state_dict,
-            'optimizer_state_dict': self.optimizer.state_dict(),
+            'optimizer_state_dict': self.optimizers[0].state_dict(),
             'num_eval': self.num_eval,
             'num_train_step': self.num_train_step,
             'num_eval_step': self.num_eval_step,
@@ -410,7 +417,7 @@ class Trainer(ABC):
         logger.info(f"Loading checkpoint from {path} ...")
         checkpoint = torch.load(path, map_location="cpu")
         self.model.load_state_dict(checkpoint['model_state_dict'])
-        self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        self.optimizers[0].load_state_dict(checkpoint['optimizer_state_dict'])
         self.start_epoch = checkpoint['epoch']
         self.num_eval = checkpoint['num_eval']
         self.num_train_step = checkpoint['num_train_step']
