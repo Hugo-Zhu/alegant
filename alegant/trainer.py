@@ -88,6 +88,7 @@ class Trainer(ABC):
         # Initialize dataloader
         train_dataloader = self.data_module.train_dataloader()
         eval_dataloader = self.data_module.val_dataloader()
+        test_dataloader = self.data_module.test_dataloader()
         
         # Initialize optimizer
         num_training_steps = len(train_dataloader) * self.args.epochs
@@ -99,8 +100,10 @@ class Trainer(ABC):
         else:
             self.start_epoch = 0
             self.num_eval = 0
+            self.num_test = 0
             self.num_train_step = 0
             self.num_eval_step = 0
+            self.num_test_step = 0
             self.best_f1 = 0
         
         # Set up multi-GPU running
@@ -151,9 +154,10 @@ class Trainer(ABC):
                 # Evaluation loop
                 if (batch_idx+1) % self.args.eval_steps == 0 or (batch_idx+1)==len(train_dataloader):
                     self.validation(eval_dataloader)
+                    self.test(test_dataloader)
             
             self.training_epoch_end(train_outputs)
-        logger.success(f"best_f1: {self.best_f1:.5f}")
+        # logger.success(f"best_f1: {self.best_f1:.5f}")
         # logger.success(f"best: {self.best}")
         self.logger.close()
     

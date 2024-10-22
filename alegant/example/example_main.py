@@ -4,7 +4,7 @@ import datetime
 from src.trainer import TrainingArguments,BertTrainer
 from src.model.modeling import BertConfig, BERT
 from src.dataset import DataModuleConfig, KaggleDataset, KaggleDataModule
-from alegant.utils import seed_everything, parse_args, logger
+from alegant import seed_everything, parse_args, logger
 
 
 @logger.catch
