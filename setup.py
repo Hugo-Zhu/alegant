@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setup(
     name='alegant',
-    version='1.0.5',
+    version='1.0.6',
     packages=find_packages(exclude=["dist.*", "dist", "*tests*", "*script*", "*cache*", "data"]),
     url='https://github.com/Hugo-Zhu/alegant',
     license='MIT',

@@ -154,7 +154,7 @@ class Trainer(ABC):
                 # Evaluation loop
                 if (batch_idx+1) % self.args.eval_steps == 0 or (batch_idx+1)==len(train_dataloader):
                     self.validation(eval_dataloader)
-                    self.test(test_dataloader)
+                    # self.test(test_dataloader)
             
             self.training_epoch_end(train_outputs)
         # logger.success(f"best_f1: {self.best_f1:.5f}")
