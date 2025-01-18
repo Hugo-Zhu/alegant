@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from torch.cuda.amp import autocast, GradScaler
 from torch.utils.tensorboard import SummaryWriter
 from .data_module import DataModule
+from .utils import get_log_dir
 
 @dataclass
 class TrainingArguments:
@@ -75,7 +76,7 @@ class Trainer(ABC):
         self.model = model.to(self.args.device)
         self.data_module = data_module
         self.criterion = nn.CrossEntropyLoss()
-        self.logger = SummaryWriter(self.args.log_dir)
+        self.logger = SummaryWriter(get_log_dir(self.args.log_dir))
         
 
     def fit(self, checkpoint=None):

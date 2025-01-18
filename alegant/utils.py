@@ -51,3 +51,16 @@ def seed_everything(seed: int) -> int:
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     return seed
+
+
+def get_log_dir(base_dir, version=None):
+    if version is None:
+        # Automatically find the next available version
+        existing_versions = [
+            int(d.split('_')[-1])
+            for d in os.listdir(base_dir)
+            if d.startswith("version") and d.split('_')[-1].isdigit()
+        ]
+        version = max(existing_versions, default=0) + 1
+
+    return os.path.join(base_dir, f"version_{version}")
